@@ -55,12 +55,22 @@ function MyApp() {
     });
     }, [] );
 
-  function updateList(person) {
-  setCharacters([...characters, person]);
+  function updateList(person) { 
+   makePostCall(person).then( result => {
+   if (result && result.status === 200)
+      setCharacters([...characters, person] );
+   });
 }
+  function removeOneCharacter (index) {
+    const updated = characters.filter((character, i) => {
+        return i !== index
+    });
+    setCharacters(updated);
+}
+
   async function fetchAll(){
    try {
-      const response = await axios.get('http://localhost:5000/users');
+      const response = await axios.get('http://localhost:5005/users');
       return response.data.users_list;     
    }
    catch (error){
@@ -70,19 +80,24 @@ function MyApp() {
    }
 }
 
+async function makePostCall(person){
+   try {
+      const response = await axios.post('http://localhost:5005/users', person);
+      return response;
+   }
+   catch (error) {
+      console.log(error);
+      return false;
+   }
+}
+
   return (
   <div className="container">
     <Table characterData={characters} removeCharacter={removeOneCharacter} />
     <Form handleSubmit={updateList} />
-  </div>
-  )
-
-
-  function removeOneCharacter (index) {
-    const updated = characters.filter((character, i) => {
-        return i !== index
-    });
-    setCharacters(updated);
+    </div>
+    )
   }
-}
+
+  
 export default MyApp;
