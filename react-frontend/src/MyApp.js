@@ -55,18 +55,39 @@ function MyApp() {
     });
     }, [] );
 
-  function updateList(person) { 
-   makePostCall(person).then( result => {
-   if (result && result.status === 200)
-      setCharacters([...characters, person] );
-   });
-}
-  function removeOneCharacter (index) {
+  /*function removeOneCharacter (index, id) {
     const updated = characters.filter((character, i) => {
         return i !== index
     });
     setCharacters(updated);
+    /*deleteRow(id); } */
+function removeOneCharacter (index, id) {
+    makeDeleteCall(characters[index]).then( result => {
+        if (result && result.status === 204) {
+            const updated = characters.filter((character, i) => {
+            return i !== index  
+        });
+        setCharacters(updated);
+        }
+        
+    });
+    
+    }
+    
+
+  /*function updateList(person) { 
+   makePostCall(person).then( result => {
+   if (result && result.status === 200)
+      setCharacters([...characters, person] );
+   });
+}*/
+function updateList(person) { 
+   makePostCall(person).then( result => {
+   if (result && result.status === 201)
+      setCharacters([...characters, result.data] );
+   });
 }
+
 
   async function fetchAll(){
    try {
@@ -74,11 +95,12 @@ function MyApp() {
       return response.data.users_list;     
    }
    catch (error){
-      //We're not handling errors. Just logging into the console.
+      // We're not handling errors. Just logging into the console.
       console.log(error); 
       return false;         
    }
 }
+  
 
 async function makePostCall(person){
    try {
@@ -91,13 +113,25 @@ async function makePostCall(person){
    }
 }
 
-  return (
-  <div className="container">
-    <Table characterData={characters} removeCharacter={removeOneCharacter} />
-    <Form handleSubmit={updateList} />
-    </div>
-    )
-  }
 
-  
+async function makeDeleteCall(person){
+    try{
+        const response = await axios.delete('http://localhost:5005/users/' + person.id);
+        return response;
+
+    }
+    catch (error) {
+        console.log(error);
+        return false;
+    }
+}
+
+    return (
+      <div className="container">
+        <Table characterData={characters} removeCharacter={removeOneCharacter} />
+        <Form handleSubmit={updateList} />
+      </div>
+  )
+
+}
 export default MyApp;

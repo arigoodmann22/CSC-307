@@ -7,27 +7,27 @@ const users = {
    users_list :
    [
       { 
-         id : 'xyz789',
+         id : '1345',
          name : 'Charlie',
          job: 'Janitor',
       },
       {
-         id : 'abc123', 
+         id : '8123', 
          name: 'Mac',
          job: 'Bouncer',
       },
       {
-         id : 'ppp222', 
+         id : '2222', 
          name: 'Mac',
          job: 'Professor',
       }, 
       {
-         id: 'yat999', 
+         id: '5479', 
          name: 'Dee',
          job: 'Aspring actress',
       },
       {
-         id: 'zap555', 
+         id: '1355', 
          name: 'Dennis', 
          job: 'Bartender', 
       }
@@ -45,11 +45,6 @@ app.get('/users', (req, res) => {
     res.send(users);
 });
 
-app.post('/users', (req, res) => {
-    const userToAdd = req.body;
-    addUser(userToAdd);
-    res.status(200).end();
-});
 
 app.get('/users', (req, res) => {
     const name = req.query.name;
@@ -94,17 +89,31 @@ app.get('/users', (req, res) => {
 });
 
 
-app.post('/users', (req, res) => {
+/*app.post('/users', (req, res) => {
     const userToAdd = req.body;
     addUser(userToAdd);
     res.status(200).end();
+});*/
+/* Linking Frontend with Backend - step 6.1*/
+app.post('/users', (req, res) => {
+    const userToAdd = req.body;
+    if (userToAdd['id'] === undefined)
+        userToAdd['id'] = generateRandomID();
+    addUser(userToAdd);
+    res.status(201).send(userToAdd);
 });
+
 /*implement hard delete operation to remove a particular user by id from the list */
 app.delete('/users/:id', (req, res)=> {
     const id = req.params.id;
-    const userToDelete = req.body;
-    deleteUser(userToDelete);
-    res.status(200).end();
+    let result = findUserById(id)
+    if (result === undefined || result.length == 0)
+        res.status(404).send('resource not found.\n');
+    else {
+        users['users_list'] = users['users_list'].filter( (user) => user['id'] != id);
+        res.status(204).end();
+    }
+    
     
 })
 
@@ -118,10 +127,6 @@ function addUser(user){
     users['users_list'].push(user);
 }
 
-function deleteUser(user){
-    const index = users['users_list'].indexOf(user);
-    users['users_list'].splice(index, 1);
-}
 
 const findUserByName = (name) => { 
     return users['users_list'].filter( (user) => user['name'] === name); 
@@ -139,4 +144,13 @@ function findUserById(id) {
     return users['users_list'].find( (user) => user['id'] === id); // or line below
     //return users['users_list'].filter( (user) => user['id'] === id);
 }
+
+/* function to generate a random ID and assign it to the new object that comes through the API post route */
+function generateRandomID(){
+    id = Math.floor(Math.random() * 10000);
+    return id;
+}
+
+
+
        
