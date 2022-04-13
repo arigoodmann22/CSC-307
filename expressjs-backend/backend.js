@@ -98,7 +98,8 @@ app.get('/users', (req, res) => {
 app.post('/users', (req, res) => {
     const userToAdd = req.body;
     if (userToAdd['id'] === undefined)
-        userToAdd['id'] = generateRandomID();
+        userToAdd['id'] = generateRandomID().toString();
+    console.log(userToAdd);
     addUser(userToAdd);
     res.status(201).send(userToAdd);
 });
